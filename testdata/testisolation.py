@@ -9,11 +9,13 @@ from astropy.io import fits
 
 from matplotlib.pyplot import imsave
 
-hdulist = fits.open('frame-g-000094-1-0100.fits.bz2')
+hdulist = fits.open('frame-r-005071-6-0456.fits.bz2')
 
 dataarray = hdulist[0].data.byteswap().newbyteorder()
 
 original = dataarray
+
+print hdulist.info()
 
 print type(dataarray)
 
@@ -30,7 +32,6 @@ np.savetxt('dataraw.txt',dataarray,fmt='%1.1e')
 
 print np.max(dataarray)
 
-
 label_a,num = ndimage.label(dataarray)
 
 print label_a
@@ -44,9 +45,11 @@ print len(locs), num
 imsave('loc1.png',dataarray[locs[0]])
 
 for i in xrange(0,len(locs)):
-     storefile = original[locs[i]]
-     hdu = fits.PrimaryHDU(storefile)
-     hdu.writeto('./testnick/frame-g-000094-1-0100-%04d.fits' % i)
+	storefile = original[locs[i]]
+	hdu = fits.PrimaryHDU(storefile)
+	#hdu.writeto('testfits/frame-g-000094-1-0100-%04d.fits' % i)
+
+	imsave('testpng/loc-%04d.png' % i,dataarray[locs[i]])
      #storefile.writeto('./testnick/frame-g-000094-1-0100'+str(i)+'.fits')
 
 #print locs
