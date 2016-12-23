@@ -47,11 +47,14 @@ def create_datasets():
         named_dataset.append(row)
     return np.asarray(named_dataset), np.asarray(dataset)
 
-
-named_dataset, dataset = create_datasets()
 ## named_dataset contains filename on index 0, data on index 1
 ## dataset contains pure data (ready for ML)
-#np.savetxt("named_dataset1.csv", named_dataset, delimiter=",", fmt='%.2d')
-np.savetxt("dataset1.csv", dataset, delimiter=",", fmt='%.3d')
+named_dataset, dataset = create_datasets()
+
+##TO DO: allow for saving of filenames or named_dataset
+
+#np.savetxt("named_dataset1.txt", named_dataset, delimiter=",")
+#np.savetxt("names.txt", filenames)
+#np.savetxt("dataset1.csv", dataset, delimiter=",", fmt='%.3d')
 
 
