@@ -7,20 +7,17 @@ import matplotlib.pyplot as plt
 import time
 from random import sample
 
-n = 200
-functions = [rotation, nothing, zoom, flip]                       #brightness]  
-function_names = ['rotation', 'translation', 'zoom', 'flip']      #'brightness']
-
 
 # loading and saving functions ###################################
 
-def load():
-    image = Image.open("107846.jpg")
+def load(name):
+    image = Image.open('%d.jpg'%name)
     return image
 
 
-def output(image,i): #,N for which N images later
-    image.save("test_{}.jpg".format(i)) 
+def output(image,i,name): #,N for which N images later
+    filename = '%d_'%name + str(i) + '.jpg'
+    image.save(filename)
     return
 
 
@@ -53,8 +50,9 @@ def rotation(image):
 #function is temporarily out of order
 def translation(image):
     rand = r.randint(-4,4,size=2)
-    idx = r.randint(0,2)
-    new_image = sci.interpolation.shift(image,rand[idx])
+    c = rand[0]
+    f = rand[1]
+    new_image = image.transform(image.size, Image.AFFINE, (1, 0, c, 0, 1, f))
     return new_image
 
 
@@ -101,9 +99,9 @@ def brightness(image):
 
 #function which will sequentially apply the transformations to each image.
 #each transformation is applied to the image once and only once.
-def augment(n):
+def augment(n,name):
     start = time.time()
-    image = load()
+    image = load(name)
     images_array = []
     for i in range(0,n):
         idx = [0,1,2,3]
@@ -113,7 +111,7 @@ def augment(n):
             new_image = functions[j](new_image)
         new_image = crop(new_image)
         new_image = shrink(new_image)
-        output(new_image,i)
+        output(new_image,i,name)
     stop = time.time()
     print "Completed ", n, " augmentations in ", stop-start, " seconds"
     return 
@@ -123,4 +121,8 @@ def augment(n):
 def nothing(image):
     return image
 
-augment(n)
+
+n = 200
+functions = [rotation, translation, zoom, flip]                       #brightness]  
+function_names = ['rotation', 'translation', 'zoom', 'flip']      #'brightness']
+augment(n,107846)
