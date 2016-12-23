@@ -52,6 +52,6 @@ named_dataset, dataset = create_datasets()
 ## named_dataset contains filename on index 0, data on index 1
 ## dataset contains pure data (ready for ML)
 #np.savetxt("named_dataset1.csv", named_dataset, delimiter=",", fmt='%.2d')
-np.savetxt("dataset1.csv", dataset, delimiter=",", fmt='%.2d')
+np.savetxt("dataset1.csv", dataset, delimiter=",", fmt='%.3d')
 
 
