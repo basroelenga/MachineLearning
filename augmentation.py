@@ -14,8 +14,8 @@ function_names = ['rotation', 'translation', 'zoom', 'flip']      #'brightness']
 
 # loading and saving functions ###################################
 
-def load():
-    image = Image.open("107846.jpg")
+def load(name):
+    image = Image.open("%d.jpg"%name)
     return image
 
 
@@ -101,9 +101,9 @@ def brightness(image):
 
 #function which will sequentially apply the transformations to each image.
 #each transformation is applied to the image once and only once.
-def augment(n):
+def augment(n,name):
     start = time.time()
-    image = load()
+    image = load(name)
     images_array = []
     for i in range(0,n):
         idx = [0,1,2,3]
