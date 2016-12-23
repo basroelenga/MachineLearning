@@ -3,15 +3,16 @@ from PIL import Image
 import numpy as np
 import numpy.random as r
 import scipy.ndimage as sci
-import scipy.misc as scimisc
-import itertools
 import matplotlib.pyplot as plt
 import time
 from random import sample
 
-n = input("How many galaxies would you like augmented today? ")
+n = 200
+functions = [rotation, nothing, zoom, flip]                       #brightness]  
+function_names = ['rotation', 'translation', 'zoom', 'flip']      #'brightness']
 
-# loading and saving functions ####################################
+
+# loading and saving functions ###################################
 
 def load():
     image = Image.open("107846.jpg")
@@ -23,7 +24,7 @@ def output(image,i): #,N for which N images later
     return
 
 
-#functions for pre-processing images prior to transformations. ####
+#functions for processing images after transformations. ##########
 
 #crops the input 424*424 images to 207*207
 def crop(image):
@@ -40,7 +41,7 @@ def shrink(image):
     return image
 
 
-# transformation functions ########################################
+# transformation functions #######################################
 
 #rotates image on random range 0-360 degrees
 def rotation(image):
@@ -57,31 +58,36 @@ def translation(image):
     return new_image
 
 
-#function is temporarily out of order
+#function that zooms between 0.7-1.3 times
 def zoom(image):
     width, height = image.size
-    rand = r.uniform(1.0,1.1)
+    rand = r.uniform(0.7,1.3)
     new_image = image.resize((int(width*rand),int(height*rand)), Image.ANTIALIAS)
     new_width, new_height = new_image.size
     a = new_width/2
-    #new_image = new_image.crop((a-103,a-103,a+104,a+104))
+    new_image = new_image.crop((a-212,a-212,a+212,a+212))
     return new_image
 
 
-#function is temporarily out of order
+#function which flips an image randomly either up down or right left or both or not at all
 def flip(image):
-    rand = r.binomial(1,0.5)
-    if rand == 1: 
+    rand = r.randint(0,4)
+    if rand == 0: 
         new_image = image.transpose(Image.FLIP_LEFT_RIGHT)
-    else:
+    elif rand == 1:
         new_image = image.transpose(Image.FLIP_TOP_BOTTOM)
+    elif rand == 2:
+        new_image = image.transpose(Image.FLIP_TOP_BOTTOM)
+        new_image = new_image.transpose(Image.FLIP_LEFT_RIGHT) 
+    else:
+        new_image = image
     return new_image    
 
 
-#function may not be used, is tricky to do right
+#function may not be used, is tricky to do right.  Need to learn PCA.
 def brightness(image):
     dim = image.shape
-    alphas = r.uniform(0,1,size=3) #randoms distribution unknown??? PCA
+    alphas = r.uniform(0,1,size=3) #randoms distribution unknown?!
     for i in range(0,dim[0]):
         for j in range(0,dim[0]):
             cov = np.cov(image[i,j])
@@ -93,8 +99,11 @@ def brightness(image):
     return new_image            
 
 
-#function which will sequentially apply the transformatins to each image
-def combinations(image,n):
+#function which will sequentially apply the transformations to each image.
+#each transformation is applied to the image once and only once.
+def augment(n):
+    start = time.time()
+    image = load()
     images_array = []
     for i in range(0,n):
         idx = [0,1,2,3]
@@ -105,6 +114,8 @@ def combinations(image,n):
         new_image = crop(new_image)
         new_image = shrink(new_image)
         output(new_image,i)
+    stop = time.time()
+    print "Completed ", n, " augmentations in ", stop-start, " seconds"
     return 
       
 
@@ -112,9 +123,4 @@ def combinations(image,n):
 def nothing(image):
     return image
 
-
-functions = [nothing, nothing, zoom, nothing] #brightness]  
-function_names = ['rotation', 'translation', 'zoom', 'flip'] #'brightness']
-
-image = load()
-combinations(image,n)
+augment(n)
