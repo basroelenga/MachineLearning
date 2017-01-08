@@ -1,6 +1,15 @@
-Galaxies on an adventure in the magical world of machine learning
+# Galaxies on an adventure in the magical world of machine learning
 
-Some useful github commands:
+## File names and their function
+
+* augmentation.py: program to do the augmentation of the images, this file consists of all required functions to do the augmentation. (the augmentation.pyc is a compiled version of this program).
+* bashscript.sh: Script that runs 9 processes instantaneously on all available cores, for the main program (max 9 cores).
+* main.py: Main program for the data augmentation, that runs all augmentation instanteously.
+* make_dataset.py: Program that makes a dataset for all available data to train the deeplearning network.
+* test.txt: Dataset of the test names of the test objects.
+* training.txt: Dataset of the training data.
+
+## Some useful github commands:
 
 - Always when you start coding, pull the existing code from the repository so everything is in sync with eachother
 command: git pull https://github.com/basroelenga/MachineLearning.git dev
