@@ -23,7 +23,7 @@ def load(image_name):
 
 def output(image,image_name,i): #,N for which N images later
     image_name = image_name[:6]
-    image.save("galaxyzoo/images_augmentation/%d_%d.jpg"%(int(image_name),i)) 
+    image.save("galaxyzoo/images_augmentation/%d-%d.jpg"%(int(image_name),i)) 
     return
 
 
@@ -69,22 +69,25 @@ def translation(image):
 #function is temporarily out of order
 def zoom(image):
     width, height = image.size
-    rand = r.uniform(1.0,1.1)
+    rand = r.uniform(1.0,1.2)
     new_image = image.resize((int(width*rand),int(height*rand)), Image.ANTIALIAS)
     new_width, new_height = new_image.size
-    a = new_width/2
-    new_image = new_image.crop((a-103,a-103,a+104,a+104))
+    dx = int((new_width-width)/2)
+    new_image = new_image.crop((dx,dx,424+dx,424+dx))
     return new_image
 
 
-#function flip
+#flips an image left or right or both
 def flip(image):
-    rand = r.binomial(1,0.5)
-    if rand == 1: 
+    rand = np.random.randint(0,3)
+    if rand == 0: 
         new_image = image.transpose(Image.FLIP_LEFT_RIGHT)
+    elif rand == 1:
+        new_image = image.transpose(Image.FLIP_TOP_BOTTOM)
     else:
         new_image = image.transpose(Image.FLIP_TOP_BOTTOM)
-    return new_image    
+        new_image = new_image.transpose(Image.FLIP_LEFT_RIGHT)
+    return new_image  
 
 
 #function may not be used, is tricky to do right
@@ -127,12 +130,12 @@ for file in glob.glob("galaxyzoo/images_training/*.jpg"):
     image_names.append(str(name))
 print len(image_names)
 
-functions = [rotation, translation, nothing, flip,] #brightness]  
+functions = [rotation, translation, zoom, flip,] #brightness]  
 function_names = ['rotation', 'translation', 'zoom', 'flip'] #'brightness']
 
 t1 = time.time()
 
-for i in range(200):
+for i in xrange(100):#len(image_names)):
     image_name = image_names[i]
     image = load('galaxyzoo/images_training/'+image_name+'.jpg')
     combinations(image,image_name,n)
