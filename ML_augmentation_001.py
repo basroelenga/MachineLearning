@@ -10,6 +10,7 @@ import matplotlib.pyplot as plt
 import time
 import glob
 from random import sample
+import time 
 
 n = input("How many galaxies would you like augmented today? ")
 
@@ -52,12 +53,17 @@ def rotation(image):
     return new_image
 
 
-#function is temporarily out of order
+#function is not out of order
 def translation(image):
-    rand = r.randint(-4,4,size=2)
-    idx = r.randint(0,2)
-    new_image = sci.interpolation.shift(image,rand[idx])
-    return new_image
+    rand = r.randint(-4,5,size=2)
+    width, height = image.size
+    rand[rand ==0] = np.random.choice([-4,-3,-2,-1,1,2,3,4])
+    new_image = Image.new("RGB", (width+rand[0], height+rand[1]))
+    new_image.paste(image, (rand[0], rand[1]))
+    rx = np.sign(rand[0])*np.random.randint(0,abs(rand[0]))
+    ry = np.sign(rand[1])*np.random.randint(0,abs(rand[1]))
+    new_image_cropped = new_image.crop((rx, ry, 424+rx, 424+ry))
+    return new_image_cropped
 
 
 #function is temporarily out of order
@@ -71,7 +77,7 @@ def zoom(image):
     return new_image
 
 
-#function is temporarily out of order
+#function flip
 def flip(image):
     rand = r.binomial(1,0.5)
     if rand == 1: 
@@ -119,12 +125,17 @@ image_names = []
 for file in glob.glob("galaxyzoo/images_training/*.jpg"):
     name = file[-10:-4]
     image_names.append(str(name))
-print image_names
+print len(image_names)
 
-functions = [rotation, nothing, nothing, flip,] #brightness]  
+functions = [rotation, translation, nothing, flip,] #brightness]  
 function_names = ['rotation', 'translation', 'zoom', 'flip'] #'brightness']
 
-for i in range(20):
+t1 = time.time()
+
+for i in range(200):
     image_name = image_names[i]
     image = load('galaxyzoo/images_training/'+image_name+'.jpg')
     combinations(image,image_name,n)
+
+t2 = time.time()
+print t2-t1
