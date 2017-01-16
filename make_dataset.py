@@ -21,8 +21,7 @@ def load_images_from_folder(folder):
     return images, filenames
 
 
-images, filenames = load_images_from_folder("/Users/users/versteeg/Documents/MSC/ML")
-
+images, filenames = load_images_from_folder("/Users/users/roelenga/workspace/MachineLearning")
 
 ## flatten along z-axis (add rgb values)
 ## NB change path to path of images
@@ -52,9 +51,25 @@ def create_datasets():
 named_dataset, dataset = create_datasets()
 
 ##TO DO: allow for saving of filenames or named_dataset
+# Create file
+str_data_header = ["#Training data"]
+np.savetxt("datasets_as_file/dataset.dat", str_data_header, fmt="%s")
 
-#np.savetxt("named_dataset1.txt", named_dataset, delimiter=",")
-#np.savetxt("names.txt", filenames)
-#np.savetxt("dataset1.csv", dataset, delimiter=",", fmt='%.3d')
+# Open handle
+f_handle = open("datasets_as_file/dataset.dat", 'a')
 
+print(named_dataset[0][1])
 
+# Save all data
+for i in range(0, len(named_dataset)):
+    
+    # Save the filename
+    str_datapart_header = ["filename: " + named_dataset[i][0]]
+    np.savetxt(f_handle, str_datapart_header, fmt='%s')
+    
+    # Save the data
+    np.savetxt(f_handle, named_dataset[i][1], fmt='%i', delimiter=',')
+    
+    # End data tag
+    str_datapart_end = ["end"]
+    np.savetxt(f_handle, str_datapart_end, fmt='%s')
