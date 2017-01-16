@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 from __future__ import division
 from PIL import Image
 import numpy as np
@@ -21,7 +22,7 @@ def load(image_name):
 
 def output(image,image_name,i): #,N for which N images later
     image_name = image_name[:6]
-    image.save("%d_%d.jpg"%(int(image_name),i)) 
+    image.save("galaxyzoo/images_augmentation/%d_%d.jpg"%(int(image_name),i)) 
     return
 
 
@@ -115,14 +116,15 @@ def nothing(image):
     return image
 
 image_names = []
-for file in glob.glob("*.jpg"):
-    image_names.append(str(file))
+for file in glob.glob("galaxyzoo/images_training/*.jpg"):
+    name = file[-10:-4]
+    image_names.append(str(name))
 print image_names
 
-functions = [rotation, translation, zoom, flip,] #brightness]  
+functions = [rotation, nothing, nothing, flip,] #brightness]  
 function_names = ['rotation', 'translation', 'zoom', 'flip'] #'brightness']
 
-for i in range(len(image_names)):
+for i in range(20):
     image_name = image_names[i]
-    image = load(image_name)
+    image = load('galaxyzoo/images_training/'+image_name+'.jpg')
     combinations(image,image_name,n)
