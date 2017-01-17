@@ -10,6 +10,7 @@ import matplotlib.pyplot as plt
 import time
 import glob
 from random import sample
+import time 
 
 n = input("How many galaxies would you like augmented today? ")
 
@@ -22,7 +23,7 @@ def load(image_name):
 
 def output(image,image_name,i): #,N for which N images later
     image_name = image_name[:6]
-    image.save("galaxyzoo/images_augmentation/%d_%d.jpg"%(int(image_name),i)) 
+    image.save("galaxyzoo/images_augmentation/%d-%d.jpg"%(int(image_name),i)) 
     return
 
 
@@ -52,33 +53,41 @@ def rotation(image):
     return new_image
 
 
-#function is temporarily out of order
+#function is not out of order
 def translation(image):
-    rand = r.randint(-4,4,size=2)
-    idx = r.randint(0,2)
-    new_image = sci.interpolation.shift(image,rand[idx])
-    return new_image
+    rand = r.randint(-4,5,size=2)
+    width, height = image.size
+    rand[rand ==0] = np.random.choice([-4,-3,-2,-1,1,2,3,4])
+    new_image = Image.new("RGB", (width+rand[0], height+rand[1]))
+    new_image.paste(image, (rand[0], rand[1]))
+    rx = np.sign(rand[0])*np.random.randint(0,abs(rand[0]))
+    ry = np.sign(rand[1])*np.random.randint(0,abs(rand[1]))
+    new_image_cropped = new_image.crop((rx, ry, 424+rx, 424+ry))
+    return new_image_cropped
 
 
 #function is temporarily out of order
 def zoom(image):
     width, height = image.size
-    rand = r.uniform(1.0,1.1)
+    rand = r.uniform(1.0,1.2)
     new_image = image.resize((int(width*rand),int(height*rand)), Image.ANTIALIAS)
     new_width, new_height = new_image.size
-    a = new_width/2
-    new_image = new_image.crop((a-103,a-103,a+104,a+104))
+    dx = int((new_width-width)/2)
+    new_image = new_image.crop((dx,dx,424+dx,424+dx))
     return new_image
 
 
-#function is temporarily out of order
+#flips an image left or right or both
 def flip(image):
-    rand = r.binomial(1,0.5)
-    if rand == 1: 
+    rand = np.random.randint(0,3)
+    if rand == 0: 
         new_image = image.transpose(Image.FLIP_LEFT_RIGHT)
+    elif rand == 1:
+        new_image = image.transpose(Image.FLIP_TOP_BOTTOM)
     else:
         new_image = image.transpose(Image.FLIP_TOP_BOTTOM)
-    return new_image    
+        new_image = new_image.transpose(Image.FLIP_LEFT_RIGHT)
+    return new_image  
 
 
 #function may not be used, is tricky to do right
@@ -119,12 +128,17 @@ image_names = []
 for file in glob.glob("galaxyzoo/images_training/*.jpg"):
     name = file[-10:-4]
     image_names.append(str(name))
-print image_names
+print len(image_names)
 
-functions = [rotation, nothing, nothing, flip,] #brightness]  
+functions = [rotation, translation, zoom, flip,] #brightness]  
 function_names = ['rotation', 'translation', 'zoom', 'flip'] #'brightness']
 
-for i in range(20):
+t1 = time.time()
+
+for i in xrange(100):#len(image_names)):
     image_name = image_names[i]
     image = load('galaxyzoo/images_training/'+image_name+'.jpg')
     combinations(image,image_name,n)
+
+t2 = time.time()
+print t2-t1
