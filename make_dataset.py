@@ -21,13 +21,13 @@ def load_images_from_folder(folder):
     return images, filenames
 
 
-images, filenames = load_images_from_folder("/Users/users/roelenga/workspace/MachineLearning")
+images, filenames = load_images_from_folder("/net/dataserver2/data/users/nobels/MachineLearning/galaxyzoo/images_augmentation")
 
 ## flatten along z-axis (add rgb values)
 ## NB change path to path of images
 def flatten_RGB():
     gray_images = []
-    for i in range(len(images)):
+    for i in xrange(len(images)):
         gray_img = np.sum(images[i], axis=2)
         gray_images.append(gray_img)
     return gray_images
@@ -37,9 +37,9 @@ def flatten_RGB():
 def create_datasets():
     named_dataset = []
     dataset = []
-    gray_images = np.asarray(flatten_RGB())
-    for i in range(len(gray_images)):
-        data_row = np.asarray(np.reshape(gray_images[i], (len(gray_images[i])**2)))
+    #gray_images = np.asarray(flatten_RGB())
+    for i in xrange(len(images)):
+        data_row = images[i]
         dataset.append(data_row)
         row = [filenames[i], data_row]
         row = np.asarray(row, dtype=object)
@@ -48,28 +48,35 @@ def create_datasets():
 
 ## named_dataset contains filename on index 0, data on index 1
 ## dataset contains pure data (ready for ML)
-named_dataset, dataset = create_datasets()
+#named_dataset, dataset = create_datasets()
 
 ##TO DO: allow for saving of filenames or named_dataset
 # Create file
 str_data_header = ["#Training data"]
-np.savetxt("datasets_as_file/dataset.dat", str_data_header, fmt="%s")
+np.savetxt("/net/dataserver2/data/users/nobels/MachineLearning/dataset.dat", str_data_header, fmt="%s")
 
 # Open handle
-f_handle = open("datasets_as_file/dataset.dat", 'a')
-
-print(named_dataset[0][1])
+f_handle = open("/net/dataserver2/data/users/nobels/MachineLearning/dataset.dat", 'a')
+print(np.shape(images))
 
 # Save all data
-for i in range(0, len(named_dataset)):
+for i in range(0, len(images)):
+    
+    print(i / len(images))
     
     # Save the filename
-    str_datapart_header = ["filename: " + named_dataset[i][0]]
+    str_datapart_header = ["f_name, 0, 0", filenames[i] + ", ,"]
     np.savetxt(f_handle, str_datapart_header, fmt='%s')
     
+    image_array = []
+    
+    for j in range(0, len(images[i])):
+        for k in range(0, len(images[i][j])):
+            image_array.append(images[i][j][k])
+        
     # Save the data
-    np.savetxt(f_handle, named_dataset[i][1], fmt='%i', delimiter=',')
+    np.savetxt(f_handle, image_array, fmt='%i', delimiter=',')
     
     # End data tag
-    str_datapart_end = ["end"]
+    str_datapart_end = ["end, , "]
     np.savetxt(f_handle, str_datapart_end, fmt='%s')
