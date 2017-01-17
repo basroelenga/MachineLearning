@@ -65,18 +65,23 @@ for i in range(0, len(images)):
     print(i / len(images))
     
     # Save the filename
-    str_datapart_header = ["f_name, 0, 0", filenames[i] + ", ,"]
+    str_datapart_header = ["f_name", filenames[i]]
     np.savetxt(f_handle, str_datapart_header, fmt='%s')
     
     image_array = []
     
     for j in range(0, len(images[i])):
         for k in range(0, len(images[i][j])):
-            image_array.append(images[i][j][k])
+            for n in range(0, len(images[i][j][k])):
+                
+                # Normalize data to rgb max
+                data_im = images[i][j][k][n] / 255
+                
+                image_array.append(data_im)
         
     # Save the data
-    np.savetxt(f_handle, image_array, fmt='%i', delimiter=',')
+    np.savetxt(f_handle, image_array, fmt='%.3f', delimiter=',')
     
     # End data tag
-    str_datapart_end = ["end, , "]
+    str_datapart_end = ["end"]
     np.savetxt(f_handle, str_datapart_end, fmt='%s')

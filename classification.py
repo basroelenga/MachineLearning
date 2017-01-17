@@ -8,6 +8,7 @@ import numpy as np
 
 # Load in the data
 data = np.genfromtxt("/net/dataserver2/data/users/nobels/MachineLearning/dataset.dat", dtype=str, delimiter=',')
+print("Done loading")
 
 # This will contain the ID
 id_list = []
@@ -43,18 +44,17 @@ for i in xrange(0, len(data)):
         
     else:
         
-        temp_data_list.append(int(data[i]))
+        temp_data_list.append(float(data[i]))
     
 # Use the machine learning from sci-kit
-mlp = MLPClassifier()
+mlp = MLPClassifier(hidden_layer_sizes=(4000))
 
 print(np.asarray(data_list).shape, np.asarray(id_list).shape)
 
 # Fit the data
 X_train, X_test, y_train, y_test = train_test_split(data_list,
                                                     class_list,
-                                                    test_size=0.25,
-                                                    random_state=3)
+                                                    test_size=0.25)
 
 mlp.fit(X_train, y_train)
 
