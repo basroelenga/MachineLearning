@@ -1,6 +1,25 @@
-Galaxies on an adventure in the magical world of machine learning
+# Galaxies on an adventure in the magical world of machine learning
 
-Some useful github commands:
+## File names and their function
+
+* augmentation.py: program to do the augmentation of the images, this file consists of all required functions to do the augmentation. (the augmentation.pyc is a compiled version of this program).
+* bashscript.sh: Script that runs 9 processes instantaneously on all available cores, for the main program (max 9 cores).
+* main.py: Main program for the data augmentation, that runs all augmentation instanteously.
+* make_dataset.py: Program that makes a dataset for all available data to train the deeplearning network.
+* test.txt: Dataset of the test names of the test objects.
+* training.txt: Dataset of the training data.
+
+## Different folders and their function
+* datafiles:
+* datalists: List of the training names with lists starting from 10000 till 19999, continueing like this for 2,3 till 9
+* fits_adventure: code from before we found the galaxyzoo data
+* galaxyzoo: galaxyzoo data, with test and training jpeg images
+* imageopener: files that can open jpegs and store them in a scikit way
+* nick: Programs from nick
+* scikit-learn-0.18.1: the latest version of scikit with deeplearning
+* testdata: 20 test images, first 20 images from the train data.
+
+## Some useful github commands:
 
 - Always when you start coding, pull the existing code from the repository so everything is in sync with eachother
 command: git pull https://github.com/basroelenga/MachineLearning.git dev
