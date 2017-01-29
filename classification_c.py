@@ -42,8 +42,9 @@ for i in range(0, len(name_data)):
     for j in range(0, len(image_data[i])):
         for k in range(0, len(image_data[i][j])):
             for n in range(0, len(image_data[i][j][k])):
-                                
-                temp_data_list.append(image_data[i][j][k][n])
+                
+                # Get data and normalize                
+                temp_data_list.append(image_data[i][j][k][n] / 255)
     
     # Get the image classification from the filename.
     classification = name_data[i].split("_")[1].split(".")[0]
@@ -62,13 +63,13 @@ mlp = MLPClassifier(hidden_layer_sizes=(layernumb), activation="tanh", max_iter=
 X_train, X_test, y_train, y_test = train_test_split(data_list,
                                                     clas_list,
                                                     test_size=0.25)
-
+'''
 mlp.fit(X_train, y_train)
 
 # Test the model by predicting on the rest of the test set.
 print ('score', mlp.score(X_test,y_test))
 
-'''
+
 # Test for best number of hidden layers
 neurons = np.linspace(10, 400, 40)
 score_list = []
@@ -96,65 +97,35 @@ print ('total time = %1.4f seconds' %(t2-t1))
 print(np.shape(image_data))
 
 # Starting deep convelution
-import theano
-import lasagne
-from lasagne import layers
+# ==================================================
 
-from lasagne.updates import nesterov_momentum
-from nolearn.lasagne import NeuralNet
-from nolearn.lasagne import visualize
-from sklearn.metrics import classification_report
-from sklearn.metrics import confusion_matrix
+from nolearn.dbn import DBN
 
-net1 = NeuralNet(
-    layers=[('input', layers.InputLayer),
-            ('conv2d1', layers.Conv2DLayer),
-            ('maxpool1', layers.MaxPool2DLayer),
-            ('conv2d2', layers.Conv2DLayer),
-            ('maxpool2', layers.MaxPool2DLayer),
-            ('dropout1', layers.DropoutLayer),
-            ('dense', layers.DenseLayer),
-            ('dropout2', layers.DropoutLayer),
-            ('output', layers.DenseLayer),
-            ],
-    # input layer
-    input_shape=np.shape((750, 50, 50, 3)),
-    # layer conv2d1
-    conv2d1_num_filters=32,
-    conv2d1_filter_size=(5, 5),
-    conv2d1_nonlinearity=lasagne.nonlinearities.rectify,
-    conv2d1_W=lasagne.init.GlorotUniform(),  
-    # layer maxpool1
-    maxpool1_pool_size=(2, 2),    
-    # layer conv2d2
-    conv2d2_num_filters=32,
-    conv2d2_filter_size=(5, 5),
-    conv2d2_nonlinearity=lasagne.nonlinearities.rectify,
-    # layer maxpool2
-    maxpool2_pool_size=(2, 2),
-    # dropout1
-    dropout1_p=0.5,    
-    # dense
-    dense_num_units=256,
-    dense_nonlinearity=lasagne.nonlinearities.rectify,    
-    # dropout2
-    dropout2_p=0.5,    
-    # output
-    output_nonlinearity=lasagne.nonlinearities.softmax,
-    output_num_units=10,
-    # optimization method params
-    update=nesterov_momentum,
-    update_learning_rate=0.01,
-    update_momentum=0.9,
-    max_epochs=10,
-    verbose=1,
-    )
+from sklearn.datasets import fetch_mldata
+from sklearn.preprocessing import MinMaxScaler
+from sklearn.cross_validation import train_test_split
 
-train_x = np.reshape(X_train, (len(X_train), 50, 50, 3))
-print(np.shape(train_x))
-nn = net1.fit(train_x, y_train)
+X_train = np.asarray(X_train)
+X_test = np.asarray(X_test)
 
+dbn_model = DBN([X_train.shape[1], 500, 2],
+                learn_rates=0.3,
+                learn_rate_decays=0.9,
+                epochs=100,
+                verbose=1)
 
+print("Deep convolution")
+print(np.asarray(X_train).shape)
+print(np.asarray(y_train).shape)
+
+dbn_model.fit(X_train, np.asarray(y_train))
+
+from sklearn.metrics import classification_report, accuracy_score
+
+y_true, y_pred = y_test, dbn_model.predict(X_test) # Get our predictions
+print(classification_report(y_true, y_pred))
+
+# ==================================================
 t2 = time.time()
 print ('total time = %1.4f seconds' %(t2-t1))
 
