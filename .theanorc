@@ -1,0 +1,5 @@
+[global]
+device = cpu
+floatX = float32
+OMP_NUM_THREADS=4
+openmp=True
