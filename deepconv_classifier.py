@@ -25,7 +25,6 @@ import lasagne as ls
 import numpy as np
 import pickle as pk
 import time
-import sys
 import os
 
 t1 = time.time()
@@ -34,6 +33,7 @@ t1 = time.time()
 def load_images_from_folder(folder):
     images = []
     filenames = []
+    
     for filename in os.listdir(folder):
         try:
             img = scim.imread(os.path.join(folder,filename))
@@ -58,12 +58,11 @@ def create_neural_net(epochs=100, solver=sgd, hidden_layer_number=500, dropout=0
     layer_list.append(('conv3', Conv2DLayer))
     layer_list.append(('conv4', Conv2DLayer))
     layer_list.append(('pool3', MaxPool2DLayer))
-    layer_list.append(('drop1', DropoutLayer))
     
     # Add the rest of the layers    
     layer_list.append(('hidden1', DenseLayer))
     layer_list.append(('hidden2', DenseLayer))
-    layer_list.append(('drop2', DropoutLayer))
+    layer_list.append(('drop1', DropoutLayer))
     layer_list.append(('output', DenseLayer))
                 
     # Create the neural net
@@ -82,20 +81,18 @@ def create_neural_net(epochs=100, solver=sgd, hidden_layer_number=500, dropout=0
         conv3_num_filters=128, conv3_filter_size=(4, 4),
         conv4_num_filters=128, conv4_filter_size=(3, 3),
         pool3_pool_size=(2, 2),
-        
-        drop1_p=dropout,
 
         # hidden layers
         hidden1_num_units=hidden_layer_number,
         hidden2_num_units=hidden_layer_number,
-        drop2_p=dropout + 0.2, 
+        drop1_p=dropout + 0.2, 
         # output layer
         output_nonlinearity=ls.nonlinearities.softmax,
         output_num_units=output_layers,
     
         # Optimization
         update=solver,
-        update_learning_rate=0.0002,
+        update_learning_rate=0.0001,
                                   
         max_epochs=epochs,
     
@@ -133,6 +130,7 @@ def get_data(name, data):
         data_list.append(temp_data_list)
         
         # Get the image classification from the filename.
+        
         temp_class = name[i].split("_")
         temp_class_list = []
             
@@ -160,9 +158,11 @@ def save_network(network, name):
     with open(name, 'wb') as handle:
         pk.dump(network_parameters, handle, protocol=pk.HIGHEST_PROTOCOL)
 
-# Load the images to test
+# Load the images to train
 image_data, name_data = load_images_from_folder("/net/dataserver2/data/users/nobels/MachineLearning/galaxyzoo/images_augmentation")
 print("Images loaded")
+
+print(np.shape(image_data), np.shape(name_data))
 
 # Get good data
 data_list, clas_list = get_data(name_data, image_data)
@@ -172,10 +172,12 @@ data_list, clas_list = get_data(name_data, image_data)
 x_train = np.asarray(data_list)
 y_train = np.asarray(np.transpose(clas_list)[0]).astype(np.uint8)
 
+print(np.shape(x_train), np.shape(y_train), np.shape(clas_list))
+
 # Create the network
 print("Creating networks")
 
-network = create_neural_net(epochs=400, solver=nesterov_momentum, hidden_layer_number=2048, dropout=0.2)
+network = create_neural_net(epochs=200, solver=nesterov_momentum, hidden_layer_number=2048, dropout=0.2)
 
 # Train the neural net
 network.fit(x_train, y_train)
@@ -211,8 +213,8 @@ data_spiral = np.asarray(data_spiral)
 data_ellips = np.asarray(data_ellips)
     
 # Detect more from spirals
-network_spiral = create_neural_net(epochs=400, solver=nesterov_momentum, hidden_layer_number=2048, dropout=0.2, output_layers=2)
-network_ellips = create_neural_net(epochs=400, solver=nesterov_momentum, hidden_layer_number=2048, dropout=0.2)
+network_spiral = create_neural_net(epochs=200, solver=nesterov_momentum, hidden_layer_number=2048, dropout=0.2, output_layers=2)
+network_ellips = create_neural_net(epochs=200, solver=nesterov_momentum, hidden_layer_number=2048, dropout=0.2)
 
 # Train these networks
 print("Training spiral")
@@ -237,10 +239,10 @@ data_list, clas_list = get_data(image_name, image_data)
 
 output_list = []
 
-output_list.append(image_name)
-output_list.append(network.predict(data_list))
-output_list.append(network_spiral.predict(data_list))
-output_list.append(network_ellips.predict(data_list))
+output_list.append(str(image_name))
+output_list.append(str(network.predict(data_list)))
+output_list.append(str(network_spiral.predict(data_list)))
+output_list.append(str(network_ellips.predict(data_list)))
 
 for i in range(0, len(output_list)):
     print(output_list[i])
