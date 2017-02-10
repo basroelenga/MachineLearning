@@ -8,6 +8,9 @@
 * make_dataset.py: Program that makes a dataset for all available data to train the deeplearning network.
 * test.txt: Dataset of the test names of the test objects.
 * training.txt: Dataset of the training data.
+* deepconv_classifier.py: Deep convolution classifier
+* mlp_classification.py: MLP classifier
+* easyload files: for giving the classifications to the images
 
 ## Different folders and their function
 * datafiles:
